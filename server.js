@@ -4,6 +4,11 @@
 // init project
 var express = require('express');
 var app = express();
+var bodyParser=require('body-parser')
+app.use((req,res,next)=>{
+  console.log(req.method+","+req.path+" - "+req.ip);
+  next();
+})
 
 // enable CORS (https://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
 // so that your API is remotely testable by FCC 
@@ -20,9 +25,23 @@ app.get("/", function (req, res) {
 
 
 // your first API endpoint... 
-app.get("/api/hello", function (req, res) {
-  res.json({greeting: 'hello API'});
+app.get("/api/timestamp/:date_string?", function (req, res) {
+  let dateString=new Date(req.params.date_string)
+  if(req.params.date_string==undefined){
+    res.json({"unix":new Date().getTime(), "utc":new Date().toUTCString()});
+  }else
+  
+  if(dateString=="Invalid Date"){
+    dateString=new Date(req.params.date_string*1000)
+    if (dateString=="Invalid Date"){
+      res.json({"error":"Invalid Date"})
+    }
+  }
+  else{
+  res.json({"unix":dateString.getTime(),"utc":dateString.toUTCString()});
+  }
 });
+
 
 
 
